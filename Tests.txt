@@ -1,0 +1,52 @@
+echo "Benim home dizinim: $HOME"
+echo 'Benim home dizinim: $HOME'
+echo $HOME"abc"'def'
+echo "Bos: $EMPTY_VAR son"
+echo '$USER' "$USER"
+echo "$ASDFGHJKL"
+echo "   bosluklar korunur  "
+echo '"deneme"'
+echo "'deneme'"
+echo $
+echo $HOMEabc
+echo ${HOME}
+echo "$HOME $USER $PATH"
+echo 'bu kapatılmamış
+echo "bu da kapatılmamış
+echo $HOME test
+echo "[$EMPTY]"
+echo hello world
+echo '$USER'
+echo "hello world"
+echo '$USER'
+echo '$PATH is my path'
+echo '$?' 
+echo "$USER"
+echo "My path: $PATH"
+echo "Exit code: $?"
+echo $USER
+echo $PATH
+echo $? 
+echo $USER$USER
+echo "$USER$USER"
+echo "User: $USER, Path: $PATH"
+echo $USER"_SUFFIX"
+echo $
+echo $$
+echo "$$"
+echo ABC$USERXYZ
+echo "$USER""$HOME"
+echo '$USER'"$HOME"
+echo "_$USER_"
+echo "$"
+echo '$'
+echo $NOT_DEFINED
+echo "$NOT_DEFINED"
+echo $?
+echo "$?"
+echo "$USER is logged in at $PWD and PATH is $PATH"
+echo 'This is $USER and $HOME' "$USER $HOME"
+
+
+
+BU TESTLERİN HEPSİ GEÇTİ 

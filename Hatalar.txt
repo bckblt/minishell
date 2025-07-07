@@ -1,0 +1,8 @@
+1 - Echo da birden fazla -n varsa bozuk çalışıyor , birleişse doğru -> DÜZELDİ
+2 - Export da tırnak içindeki stiringler yanlış 
+3 - exit de fazla argüman varsa çıkmicak -> DÜZELDİ
+4 - ls "" girdisi. -> DÜZELDİ
+5 - komut bulunamadı hatasında exit_code ve glabal yasak exit_code mevzusu komple değişcek
+6 - echo > , "> dosya" girdisinin boş dosya açması lazım  -> DÜZELDİ
+7 - Ctrl c promt yenilicek, Ctrl d ekrana exit yazıp çıkcak -> DÜZELDİ
+8 - echo deneme >> test.txt gitdileri hatalı 

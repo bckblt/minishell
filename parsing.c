@@ -76,11 +76,12 @@ t_cmd *ft_parsing(t_token *tokens, t_list *mini)
 	(void)mini;
 	t_cmd *head = NULL;
 	t_cmd **tail = &head;
+	t_fd *fds;
+	fds = malloc(sizeof(t_fd));
 	while (tokens)
 	{
 		t_cmd *cmd = ft_calloc(1, sizeof(t_cmd));
 		if (!cmd) return NULL;
-		
 		parse_command(&cmd, &tokens);
 		
 		*tail = cmd;
@@ -89,5 +90,6 @@ t_cmd *ft_parsing(t_token *tokens, t_list *mini)
 		if (tokens && !strcmp(tokens->type, "pipe"))
 		tokens = tokens->next;
 	}
+	head->fd = fds;
 	return head;
 }

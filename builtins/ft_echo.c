@@ -54,7 +54,6 @@ void    ft_echo(t_cmd *cmds, int quote, char *input)
 	int j = 0;
 	int spc = spc_chk(input);
 	char **strngs = cmds->command;
-
 	while(strngs[i])
 	{
 		j = 0;
@@ -78,14 +77,12 @@ void    ft_echo(t_cmd *cmds, int quote, char *input)
 				j += 2;
 				continue;
 			}
-			if(cmds->redirections[0] == NULL)
-				write(1, &strngs[i][j], 1); 
+			write(1, &strngs[i][j], 1); 
 			j++;
 		}
 		if (strngs[i + 1] && strngs[i][0] != '\0' && spc != 0) 
 			write(1, " ", 1);
 		i++;
 	}
-	if(cmds->redirections[0] == NULL)
-		write(1, "\n", 1);
+	write(1, "\n", 1);
 }

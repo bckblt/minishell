@@ -23,6 +23,13 @@ typedef struct s_list
 	char **exp_cpy;
 }   t_list;
 
+typedef struct s_fd
+{
+	int stdout;
+	int stderr;
+	int stdin;
+} t_fd;
+
 typedef struct s_token
 {
 	char *value;
@@ -39,9 +46,12 @@ typedef struct s_cmd
 	int quote_num;
 	int pipe_fd[2];
 	struct s_cmd *next;
+	struct s_fd *fd;
 } t_cmd;
 
-void    apply_redirections(char **redirections);
+
+void retfd(t_cmd *cmd);
+void apply_redirections(char **redirections, t_fd *fds);
 int     node_c(t_cmd *node);
 void    ft_cd(char **args);
 int     ft_exp(char **env, t_cmd *input);

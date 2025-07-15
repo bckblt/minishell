@@ -95,14 +95,15 @@ int ft_exp(char **env, t_cmd *input)
 int ft_unset(char **env, char *var_name)
 {
 	int i = 0;
-	int var_len = ft_strlen(var_name);
+	int var_len;
 	int removed = 0;
 
 	if (!var_name)
 	{
-		fprintf(stderr, "unset: not enough arguments\n");
+		printf("unset: not enough arguments\n");
 		return (1);
 	}
+	var_len = ft_strlen(var_name);
 	while (env[i])
 	{
 		if (ft_strncmp(env[i], var_name, var_len) == 0 && env[i][var_len] == '=')
@@ -130,47 +131,32 @@ int ft_unset(char **env, char *var_name)
 
 void ft_builtins(t_list *mini, t_cmd *cmds, char **env)
 {
-	if (cmds->next != NULL || cmds->redirections[0] != NULL)
+    int is_builtin = is_builtin_command(cmds->command[0]);
+    
+    if (is_builtin)
     {
-        ft_cmds(mini, cmds, env);
+        if (cmds->redirections)
+            apply_redirections(cmds->redirections, cmds->fd);
+        if(ft_strncmp(cmds->command[0], "exit", 4) == 0)
+            return;
+        if (ft_strncmp(cmds->command[0], "echo", 4) == 0)
+            ft_echo(cmds, cmds->quote_num, mini->input);
+        if (ft_strncmp(cmds->command[0], "pwd", 3) == 0)
+            ft_pwd();
+        if (ft_strncmp(cmds->command[0], "cd", 2) == 0)
+            ft_cd(cmds->command);
+        if (ft_strncmp(cmds->command[0], "export", 6) == 0)
+            ft_exp(env, cmds);
+        if (ft_strncmp(cmds->command[0], "unset", 5) == 0)
+            ft_unset(env, cmds->command[1]);
+        if (ft_strncmp(cmds->command[0], "env", 3) == 0)
+            ft_env(env, cmds->command);
+        
+        if (cmds->redirections)
+            retfd(cmds);
+        
         return;
     }
-
-	if(cmds->command[0] != NULL)
-	{
-		if(ft_strncmp(cmds->command[0], "exit", 4) == 0)
-			return;
-		if (ft_strncmp(cmds->command[0], "echo", 4) == 0)
-		{
-			ft_echo(cmds, cmds->quote_num, mini->input);
-			if(cmds->redirections[0] == NULL)
-				return;
-		}
-		if (ft_strncmp(cmds->command[0], "pwd", 3) == 0)
-		{
-			ft_pwd();
-			return;
-		}
-		if (ft_strncmp(cmds->command[0], "cd", 2) == 0)
-		{
-			ft_cd(cmds->command);
-			return;
-		}
-		if (ft_strncmp(cmds->command[0], "export", 6) == 0)
-		{
-			ft_exp (env, cmds);
-			return;
-		}
-		if (ft_strncmp(cmds->command[0], "unset", 5) == 0)
-		{
-			ft_unset(env, cmds->command[1]);
-			return;
-		}
-		if (ft_strncmp(cmds->command[0], "env", 3) == 0)
-		{
-			ft_env(env, cmds->command);
-			return;
-		}
-	}
-	ft_cmds(mini, cmds, env);
+    
+    ft_cmds(mini, cmds, env);
 }

@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -I/opt/homebrew/opt/readline/include -Wall -Wextra -Werror -I. 
+CFLAGS = -Wall -Wextra -Werror -I. 
 DEBUG_FLAGS = -g
 
 NAME = minishell
@@ -11,7 +11,7 @@ OBJ = $(SRC:.c=.o)
 LIBFT_DIR = ./libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-RL_LIB = -L/opt/homebrew/opt/readline/lib -lreadline
+RL_LIB = -lreadline
 
 all: $(NAME) 
 

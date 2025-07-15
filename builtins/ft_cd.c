@@ -5,6 +5,8 @@ void	ft_cd(char **args)
 	char *oldpwd;
 	char *path;
 	char *new;
+	printf("-----------\n");
+
 	if(args[1] && args[2])
 	{
 		printf("cd: too meny arguments\n");

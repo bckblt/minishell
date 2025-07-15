@@ -1,5 +1,22 @@
 #include "minishell.h"
 
+void retfd(t_cmd *cmd)
+{
+    t_fd *fd = cmd->fd;
+    if (fd->stdout != 0) {
+        dup2(fd->stdout, STDOUT_FILENO);
+        close(fd->stdout);
+    }
+    if (fd->stdin != 0) {
+        dup2(fd->stdin, STDIN_FILENO);
+        close(fd->stdin);
+    }
+    if (fd->stderr != 0) {
+        dup2(fd->stderr, STDERR_FILENO);
+        close(fd->stderr);
+    }
+}
+
 void exec_builtin(t_cmd *cmd, t_list *mini, char **env)
 {
     if (ft_strncmp(cmd->command[0], "cd", 2) == 0)
@@ -14,6 +31,8 @@ void exec_builtin(t_cmd *cmd, t_list *mini, char **env)
         ft_unset(env, cmd->command[1]);
     else if (ft_strncmp(cmd->command[0], "env", 3) == 0)
         ft_env(env, cmd->command);
+    if(cmd->next)
+        retfd(cmd);
     exit(0);
 }
 
@@ -34,7 +53,7 @@ void    ft_cmds(t_list *mini, t_cmd *cmd, char **env)
         if (pid == 0)
         {
             if (cmd->redirections)
-                apply_redirections(cmd->redirections);
+                apply_redirections(cmd->redirections, cmd->fd);
             
             if (prev_pipe_in != -1)
                 dup2(prev_pipe_in, STDIN_FILENO);

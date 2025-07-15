@@ -5,4 +5,15 @@
 5 - komut bulunamadı hatasında exit_code ve glabal yasak exit_code mevzusu komple değişcek
 6 - echo > , "> dosya" girdisinin boş dosya açması lazım  -> DÜZELDİ
 7 - Ctrl c promt yenilicek, Ctrl d ekrana exit yazıp çıkcak -> DÜZELDİ
-8 - echo deneme >> test.txt gitdileri hatalı 
+
+				---yeni---
+*export ve unset hatası
+	{
+		export var=deneme
+		echo $var
+	}
+	bu girdilerin çıktısı olmuyor
+	{
+		unset
+	}
+	dümdüz unset yazınca seg alıyoz

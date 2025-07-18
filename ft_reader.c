@@ -52,20 +52,21 @@ void    ft_cmds(t_list *mini, t_cmd *cmd, char **env)
         pid_t pid = fork();
         if (pid == 0)
         {
-            if (cmd->redirections)
-                apply_redirections(cmd->redirections, cmd->fd);
-            
             if (prev_pipe_in != -1)
                 dup2(prev_pipe_in, STDIN_FILENO);
-            
+
             if (cmd->next)
                 dup2(pipe_fd[1], STDOUT_FILENO);
+
+            if (cmd->redirections)
+                if(apply_redirections(cmd->redirections, cmd->fd) == -1)
+                    return;
 
             if (is_builtin)
                 exec_builtin(cmd, mini, env);
             else
                 exec_command(cmd->command, mini->paths, env);
-            
+
             exit(1);
         }
 

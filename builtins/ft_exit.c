@@ -8,6 +8,11 @@ int    exit_with_arg(char *inp)
 	char **chk;
 	int num;
 	chk = ft_split(inp, ' ');
+	if(ft_strcmp(inp, "exit") == 0)
+	{
+		printf("%d\n", exit_code);
+		exit(0);
+	}
 	if(chk[1] && chk[2])
 	{
 		printf("minishell: exit: too many arguments\n");	

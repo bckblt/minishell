@@ -51,7 +51,7 @@ typedef struct s_cmd
 
 
 void retfd(t_cmd *cmd);
-void apply_redirections(char **redirections, t_fd *fds);
+int apply_redirections(char **redirections, t_fd *fds);
 int     node_c(t_cmd *node);
 void    ft_cd(char **args);
 int     ft_exp(char **env, t_cmd *input);

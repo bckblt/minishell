@@ -133,10 +133,12 @@ void ft_builtins(t_list *mini, t_cmd *cmds, char **env)
 {
     int is_builtin = is_builtin_command(cmds->command[0]);
     
-    if (is_builtin)
+    if (is_builtin && !cmds->next)
     {
         if (cmds->redirections)
-            apply_redirections(cmds->redirections, cmds->fd);
+            if(apply_redirections(cmds->redirections, cmds->fd) == -1)
+                return;
+
         if(ft_strncmp(cmds->command[0], "exit", 4) == 0)
             return;
         if (ft_strncmp(cmds->command[0], "echo", 4) == 0)

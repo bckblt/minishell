@@ -23,7 +23,7 @@ int    ft_heredoc(char **redirections)
     return(fd[0]);
 }
 
-void apply_redirections(char **redirections, t_fd *fds)
+int apply_redirections(char **redirections, t_fd *fds)
 {
     for (int i = 0; redirections[i]; i += 2) 
     {
@@ -33,18 +33,36 @@ void apply_redirections(char **redirections, t_fd *fds)
         int fd = 0;
         if (strcmp(type, ">") == 0) {
             fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            printf("FD = %d\n",fd);
+            if (fd <= -1)
+            {
+                printf("Böyle bir dosya ya da dizin yok\n");
+                return(-1);
+            }            
             fds->stdout = dup(STDOUT_FILENO);
             dup2(fd, STDOUT_FILENO);
+            close(fd);
         }
         else if (strcmp(type, ">>") == 0)
         {
             fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+            if (fd <= -1)
+            {
+                printf("Böyle bir dosya ya da dizin yok\n");
+                return(-1);
+            }
             fds->stdout = dup(STDOUT_FILENO);
             dup2(fd, STDOUT_FILENO);
+            close(fd);
         }
         else if (strcmp(type, "<") == 0)
         {
             fd = open(file, O_RDONLY);
+            if (fd <= -1)
+            {
+                printf("Böyle bir dosya ya da dizin yok\n");
+                return(-1);
+            }
             fds->stdin = dup(STDIN_FILENO);
             dup2(fd, STDIN_FILENO);
         }
@@ -52,6 +70,6 @@ void apply_redirections(char **redirections, t_fd *fds)
         {
             (ft_heredoc(redirections));
         }
-        close(fd);
     }
+    return (0);
 }

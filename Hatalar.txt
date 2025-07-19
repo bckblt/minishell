@@ -1,0 +1,30 @@
+1 - Echo da birden fazla -n varsa bozuk çalışıyor , birleişse doğru -> DÜZELDİ
+2 - Export da tırnak içindeki stiringler yanlış 
+3 - exit de fazla argüman varsa çıkmicak -> DÜZELDİ
+4 - ls "" girdisi. -> DÜZELDİ
+5 - komut bulunamadı hatasında exit_code ve glabal yasak exit_code mevzusu komple değişcek
+6 - echo > , "> dosya" girdisinin boş dosya açması lazım  -> DÜZELDİ
+7 - Ctrl c promt yenilicek, Ctrl d ekrana exit yazıp çıkcak -> DÜZELDİ
+
+				---yeni---
+*export ve unset hatası
+	{
+		export var=deneme
+		echo $var
+	}
+	bu girdilerin çıktısı olmuyor
+	{
+		unset
+	}
+	dümdüz unset yazınca seg alıyoz
+
+cd komutunudaki hatalar
+
+cd /var/log && ls -l girdisi çıktı üretebilmeli
+-------------------------
+export komutundaki hatalar
+
+export VAR1="hello" VAR2="world"; export -p | grep VAR
+------------------------
+tr -cs 'A-Za-z' '[\n*]' < largefile.txt | tr 'A-Z' 'a-z' | sort | uniq -c | sort -nr | head -n 10 >> top_words.txt
+bu girdide hata var çalışmıyor direkt ben tokendan kaynaklı olduğunu düşünüyorum

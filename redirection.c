@@ -32,16 +32,32 @@ int ft_heredoc(char **redirections)
     close(fd[1]);
     return fd[0];
 }
-void fd_closer(char *file, t_fd *fds)
+
+void fd_closer(char *file, t_fd *fds, t_list *mini)
 {
+    (void)file;
     ft_putstr_fd("minishell: ", STDERR_FILENO);
-    ft_putstr_fd(file, STDERR_FILENO);
-    ft_putstr_fd(": open error\n", STDERR_FILENO);
+    //ft_putstr_fd(file, STDERR_FILENO);
+    ft_putstr_fd("No such file or directory\n", STDERR_FILENO);
     fds->stderr = -1;
     fds->stdin = -1;
     fds->stdout = -1;
+    mini->exit_code = 1;
 }
-void apply_redirections(char **redirections, t_fd *fds)
+
+void fd_closer_right(char *file, t_fd *fds, t_list *mini)
+{
+    (void)file;
+    ft_putstr_fd("minishell: ", STDERR_FILENO);
+    //ft_putstr_fd(file, STDERR_FILENO);
+    ft_putstr_fd("Permission denied\n", STDERR_FILENO);
+    fds->stderr = -1;
+    fds->stdin = -1;
+    fds->stdout = -1;
+    mini->exit_code = 1;
+}
+
+void apply_redirections(char **redirections, t_fd *fds, t_list *mini)
 {
     int i;
     char *type;
@@ -56,7 +72,7 @@ void apply_redirections(char **redirections, t_fd *fds)
             int fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             if (fd == -1)
             {
-                fd_closer(file, fds);
+                fd_closer_right(file, fds, mini);
                 return ;
             }
             fds->stdout = dup(STDOUT_FILENO);
@@ -68,7 +84,7 @@ void apply_redirections(char **redirections, t_fd *fds)
             int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0644);
             if (fd == -1)
             {
-                fd_closer(file, fds);
+                fd_closer_right(file, fds, mini);
                 return ;
             }
             fds->stdout = dup(STDOUT_FILENO);
@@ -80,7 +96,7 @@ void apply_redirections(char **redirections, t_fd *fds)
             int fd = open(file, O_RDONLY);
             if (fd == -1)
             {
-                fd_closer(file, fds);
+                fd_closer(file, fds, mini);
                 return ;
             }
             fds->stdin = dup(STDIN_FILENO);

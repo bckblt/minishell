@@ -45,42 +45,43 @@ int heredoc_ctrl(t_cmd *cmd)
     return (0);
 }
 
-void    ft_cmds(t_list *mini, t_cmd *cmd, char **env)
+void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
 {
     int prev_pipe_in = -1;
     int pipe_fd[2];
     int heredoc_fd = -1;
+    pid_t last_pid = -1;
+
     while (cmd)
     {
         if (cmd->next)
             pipe(pipe_fd);
+
         if (heredoc_ctrl(cmd))
             heredoc_fd = ft_heredoc(cmd->redirections);
-        pid_t pid = fork();
 
+        pid_t pid = fork();
         if (pid == 0)
         {
             if (cmd->redirections && heredoc_fd == -1)
             {
-                apply_redirections(cmd->redirections, cmd->fd);
-                if(cmd->fd->stdout == -1 || cmd->fd->stdin == -1 || cmd->fd->stderr == -1)
+                apply_redirections(cmd->redirections, cmd->fd, mini);
+                if (cmd->fd->stdout == -1 || cmd->fd->stdin == -1 || cmd->fd->stderr == -1)
                     exit(mini->exit_code);
             }
             if (prev_pipe_in != -1)
                 dup2(prev_pipe_in, STDIN_FILENO);
-
             if (cmd->next)
                 dup2(pipe_fd[1], STDOUT_FILENO);
-
             if (is_builtin_command(cmd))
                 exec_builtin(cmd, mini, env);
             else
                 exec_command(cmd->command, mini->paths, env, mini);
             exit(mini->exit_code);
         }
+        last_pid = pid;
         if (prev_pipe_in != -1)
             close(prev_pipe_in);
-        
         if (cmd->next)
         {
             close(pipe_fd[1]);
@@ -88,5 +89,12 @@ void    ft_cmds(t_list *mini, t_cmd *cmd, char **env)
         }
         cmd = cmd->next;
     }
-    while (wait(NULL) > 0);
+
+    int status;
+    pid_t wpid;
+    while ((wpid = wait(&status)) > 0)
+    {
+        if (wpid == last_pid && WIFEXITED(status))
+            mini->exit_code = WEXITSTATUS(status);
+    }
 }

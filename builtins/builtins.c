@@ -157,7 +157,7 @@ void ft_builtins(t_list *mini, t_cmd *cmds, char **env)
     else if (is_builtin)
     {
         if (cmds->redirections)
-            apply_redirections(cmds->redirections, cmds->fd);
+            apply_redirections(cmds->redirections, cmds->fd, mini);
         if(ft_strcmp(cmds->command[0], "exit") == 0)
             return;
         if (ft_strcmp(cmds->command[0], "echo") == 0)

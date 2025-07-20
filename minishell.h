@@ -50,7 +50,7 @@ typedef struct s_cmd
 
 int    ft_heredoc(char **redirections);
 void retfd(t_cmd *cmd);
-void apply_redirections(char **redirections, t_fd *fds);
+void apply_redirections(char **redirections, t_fd *fds, t_list *mini);
 int     node_c(t_cmd *node);
 void    ft_cd(char **args, t_list *mini);
 int     ft_exp(char **env, t_cmd *input, t_list *mini);
@@ -82,5 +82,6 @@ void    get_pid_echo();
 void    ft_env(char **env, char **cmds, t_list *mini);
 int is_builtin_command(t_cmd *cmd);
 void	print_error(char *err);
+int	valid_file_chk(t_token *tokens);
 
 #endif

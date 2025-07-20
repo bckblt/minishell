@@ -44,7 +44,7 @@ void exec_command(char **args, char **paths, char **env, t_list *mini)
 	{
 		fprintf(stderr, "minishell: %s: command not found\n", args[0]);
 		mini->exit_code = 127;
-		exit(1);
+		exit(mini->exit_code = 127);
 	}
 	execve(full_path, args, env);
 	perror("execve");

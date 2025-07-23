@@ -45,6 +45,20 @@ int heredoc_ctrl(t_cmd *cmd)
     return (0);
 }
 
+// Yeni fonksiyon: Input redirection kontrolü
+int has_input_redirection(t_cmd *cmd)
+{
+    if (!cmd->redirections)
+        return 0;
+    
+    for (int i = 0; cmd->redirections[i]; i += 2)
+    {
+        if (ft_strcmp(cmd->redirections[i], "<") == 0)
+            return 1;
+    }
+    return 0;
+}
+
 void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
 {
     int prev_pipe_in = -1;
@@ -63,16 +77,34 @@ void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
         pid_t pid = fork();
         if (pid == 0)
         {
+            // Input redirection kontrolü
+            int has_input_redir = has_input_redirection(cmd);
+            // Pipe input - sadece input redirection yoksa uygula
+            if (prev_pipe_in != -1 && !has_input_redir && heredoc_fd == -1)
+                dup2(prev_pipe_in, STDIN_FILENO);
+            // Pipe output
+            if (cmd->next)
+                dup2(pipe_fd[1], STDOUT_FILENO);
+            // Heredoc input
+            if (heredoc_fd != -1)
+                dup2(heredoc_fd, STDIN_FILENO);
+            // Normal redirections
             if (cmd->redirections && heredoc_fd == -1)
             {
                 apply_redirections(cmd->redirections, cmd->fd, mini);
-                if (cmd->fd->stdout == -1 || cmd->fd->stdin == -1 || cmd->fd->stderr == -1)
+                if (mini->exit_code == 1)
                     exit(mini->exit_code);
             }
+            // Close unused pipe ends
             if (prev_pipe_in != -1)
-                dup2(prev_pipe_in, STDIN_FILENO);
-            if (cmd->next)
-                dup2(pipe_fd[1], STDOUT_FILENO);
+                close(prev_pipe_in);
+            if (cmd->next) {
+                close(pipe_fd[0]);
+                close(pipe_fd[1]);
+            }
+            if (heredoc_fd != -1)
+                close(heredoc_fd);
+            
             if (is_builtin_command(cmd))
                 exec_builtin(cmd, mini, env);
             else
@@ -80,16 +112,19 @@ void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
             exit(mini->exit_code);
         }
         last_pid = pid;
+        // Parent process: close unused pipe ends
         if (prev_pipe_in != -1)
             close(prev_pipe_in);
+        if (heredoc_fd != -1)
+            close(heredoc_fd);
         if (cmd->next)
         {
             close(pipe_fd[1]);
             prev_pipe_in = pipe_fd[0];
-        }
+        } 
         cmd = cmd->next;
     }
-
+    // Wait for all children
     int status;
     pid_t wpid;
     while ((wpid = wait(&status)) > 0)

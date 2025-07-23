@@ -151,6 +151,8 @@ int ft_unset(char **env, char *var_name)
 
 void ft_builtins(t_list *mini, t_cmd *cmds, char **env)
 {
+	if(!cmds)
+		return;
     int is_builtin = is_builtin_command(cmds);
     if (cmds->next)
 		ft_cmds(mini, cmds, env);

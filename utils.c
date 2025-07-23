@@ -37,18 +37,47 @@ int node_c(t_cmd *node)
 	return(i);
 }
 
+int is_directory(const char *path)
+{
+	struct stat path_stat;
+	if (stat(path, &path_stat) != 0)
+		return 0;
+	return (S_ISDIR(path_stat.st_mode));
+}
+
 void exec_command(char **args, char **paths, char **env, t_list *mini)
 {
+	if (!args[0] || args[0][0] == '\0')
+		return;
 	char *full_path = get_full_path(args[0], paths);
+
 	if (!full_path)
 	{
 		fprintf(stderr, "minishell: %s: command not found\n", args[0]);
-		mini->exit_code = 127;
 		exit(mini->exit_code = 127);
 	}
+	if (is_directory(full_path))
+	{
+		fprintf(stderr, "minishell: %s: is a directory\n", args[0]);
+		free(full_path);
+		exit(mini->exit_code = 126);
+	}
+	if (access(full_path, F_OK) != 0)
+	{
+		print_error(" No such file or directory");
+		free(full_path);
+		exit(127);
+	}
+	if (access(full_path, X_OK) != 0)
+	{
+		print_error(" Permission denied");
+   		free(full_path);
+   		exit(126);
+	}	
 	execve(full_path, args, env);
 	perror("execve");
-	exit(mini->exit_code);
+	free(full_path);
+	exit(mini->exit_code = 1);
 }
 
 char *get_full_path(char *cmd, char **paths)
@@ -61,7 +90,7 @@ char *get_full_path(char *cmd, char **paths)
 	{
 		char *full_path = ft_strjoin(paths[i], "/");
 		full_path = ft_strjoin(full_path, cmd);
-		if (access(full_path, X_OK) == 0)
+		if (access(full_path, F_OK) == 0 )
 			return full_path;
 		free(full_path);
 		i++;

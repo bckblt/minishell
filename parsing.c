@@ -21,6 +21,7 @@ int cmd_chk(char *cmd, char **paths)
 	}
 	return 0;
 }
+
 int ft_lstsize(t_token *tokens)
 {
 	int i;
@@ -58,7 +59,8 @@ void parse_command(t_cmd **cmd, t_token **tokens, t_list *mini)
 		{
 			if(if_has_dollar((*tokens)->value) && !strcmp((*tokens)->type, "word"))
 				(*tokens)->value = exp_dollar((*tokens)->value, (*tokens)->quote_num, mini);
-			(*cmd)->command[i++] = ft_strdup((*tokens)->value);
+			if(ft_strcmp((*tokens)->value, "") != 0)
+				(*cmd)->command[i++] = ft_strdup((*tokens)->value);
 			(*cmd)->quote_num = (*tokens)->quote_num;
 			(*tokens) = (*tokens)->next;
 		}
@@ -77,20 +79,33 @@ t_cmd *ft_parsing(t_token *tokens, t_list *mini)
 	(void)mini;
 	t_cmd *head = NULL;
 	t_cmd **tail = &head;
-	t_fd *fds;
-	fds = malloc(sizeof(t_fd));
+
 	while (tokens)
 	{
 		t_cmd *cmd = ft_calloc(1, sizeof(t_cmd));
 		if (!cmd) return NULL;
+		
+		// Her komut için ayrı fd structure oluştur
+		t_fd *fds = malloc(sizeof(t_fd));
+		if (!fds) 
+		{
+			free(cmd);
+			return NULL;
+		}
+		// fd'leri sıfırla
+		fds->stdin = 0;
+		fds->stdout = 0;
+		fds->stderr = 0;
+		cmd->fd = fds;
+		
 		parse_command(&cmd, &tokens, mini);
 		
 		*tail = cmd;
 		tail = &cmd->next;
 		
 		if (tokens && !strcmp(tokens->type, "pipe"))
-		tokens = tokens->next;
+			tokens = tokens->next;
 	}
-	head->fd = fds;
+	
 	return head;
 }

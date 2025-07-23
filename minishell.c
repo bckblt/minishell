@@ -18,6 +18,11 @@ int main(int ac, char **av, char **env)
 	while (1)
 	{
 		mini->input = readline("minishell$ ");
+		if(!mini->input)
+		{
+			printf("exit\n");
+			exit(mini->exit_code);
+		}
 		if(mini->input[0] == '\0')
 			continue;
 		if(!ft_exit_chk(mini, mini->input))

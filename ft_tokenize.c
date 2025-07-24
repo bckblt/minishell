@@ -175,7 +175,6 @@ void ft_token(char *input, t_token **tokens)
 			}
 			quote = 0;
 		}
-		
 	}
 	//write_list(*tokens);
 }

@@ -13,7 +13,7 @@ int main(int ac, char **av, char **env)
 		return (0);
 	ft_memset(mini, 0, sizeof(t_list));
 	paths(env, mini);
-	signal(SIGINT, handle_sig); 
+	signal(SIGINT, handle_sig);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{

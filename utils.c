@@ -58,7 +58,7 @@ void exec_command(char **args, char **paths, char **env, t_list *mini)
 	}
 	if (is_directory(full_path))
 	{
-		fprintf(stderr, "minishell: %s: is a directory\n", args[0]);
+		fprintf(stderr, "minishell: %s: Is a directory\n", args[0]);
 		free(full_path);
 		exit(mini->exit_code = 126);
 	}

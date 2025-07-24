@@ -47,7 +47,7 @@ int    exit_with_arg(char *inp, t_list *mini)
 		{
 			printf("exit\n");
 			print_error(" numeric argument required\n");
-			mini->exit_code = 255;
+			mini->exit_code = 2;
 			exit(mini->exit_code);
 			return(2);
 		}

@@ -1,5 +1,5 @@
 #ifndef MINISHELL_H
-#define MINISHELL_H
+# define MINISHELL_H
 
 #include <unistd.h>
 #include <stdio.h>
@@ -49,7 +49,7 @@ typedef struct s_cmd
 	struct s_fd *fd;
 } t_cmd;
 
-int    ft_heredoc(char **redirections);
+int    ft_heredoc(char **redirections, t_list *mini);
 void retfd(t_cmd *cmd);
 void apply_redirections(char **redirections, t_fd *fds, t_list *mini);
 int     node_c(t_cmd *node);

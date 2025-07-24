@@ -19,7 +19,7 @@ void    ft_echo_n(char **strngs, t_list *mini)
 	while(strngs[i])
 	{
 		j = 0;
-		if(ft_strncmp("-n", strngs[i], 2) == 0)
+		if(ft_strcmp("-n", strngs[i]) == 0)
 		{
 			i++;
 			continue;

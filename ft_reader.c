@@ -38,14 +38,26 @@ void exec_builtin(t_cmd *cmd, t_list *mini, char **env)
 
 int heredoc_ctrl(t_cmd *cmd)
 {
-    if (!cmd->redirections || !cmd->redirections[0])
-        return (0);
-    if (ft_strcmp(cmd->redirections[0], "<<") == 0)
-        return(1);
-    return (0);
+    t_cmd *tmp = cmd;
+
+    while (tmp)
+    {
+        if (!tmp->redirections)
+        {
+            tmp = tmp->next;
+            continue;
+        }
+
+        for (int i = 0; tmp->redirections[i]; i += 2)
+        {
+            if (ft_strcmp(tmp->redirections[i], "<<") == 0)
+                return (1);
+        }
+        tmp = tmp->next;
+    }
+    return 0;
 }
 
-// Yeni fonksiyon: Input redirection kontrolü
 int has_input_redirection(t_cmd *cmd)
 {
     if (!cmd->redirections)
@@ -72,12 +84,12 @@ void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
             pipe(pipe_fd);
 
         if (heredoc_ctrl(cmd))
-            heredoc_fd = ft_heredoc(cmd->redirections);
+            heredoc_fd = ft_heredoc(cmd->redirections, mini);
 
         pid_t pid = fork();
         if (pid == 0)
         {
-            // Input redirection kontrolü
+            // Input redirection kontrolu
             int has_input_redir = has_input_redirection(cmd);
             // Pipe input - sadece input redirection yoksa uygula
             if (prev_pipe_in != -1 && !has_input_redir && heredoc_fd == -1)

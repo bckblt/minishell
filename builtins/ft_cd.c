@@ -11,7 +11,7 @@ void	ft_cd(char **args, t_list *mini)
 		path = getenv("HOME");
 		if(!path)
 		{
-			printf("cd: HOME not set\n");
+			ft_putstr_fd("cd: HOME not set\n", 2);
 			mini->exit_code = 1;
 			return;
 		}
@@ -21,12 +21,18 @@ void	ft_cd(char **args, t_list *mini)
 		oldpwd = getenv("OLDPWD");
 		if(!oldpwd)
 		{
-			printf("cd: OLDPWD not set\n");
+			ft_putstr_fd("cd: OLDPWD not set\n", STDERR_FILENO);
 			mini->exit_code = 1;
 			return;
 		}
 		path = oldpwd;
 		printf("%s\n", path);
+	}
+	else if (args[0] && args[1] && args[2])
+	{
+		ft_putstr_fd("bash: cd: too mant arguments\n", STDERR_FILENO);
+		mini->exit_code = 1;
+		return ;
 	}
 	else
 		path = args[1];
@@ -41,7 +47,7 @@ void	ft_cd(char **args, t_list *mini)
 	new = getcwd(NULL , 0);
 	if(!new)
 	{
-		perror("cd");
+		ft_putstr_fd("cd", STDERR_FILENO);
 		mini->exit_code = 1;
 		return;
 	}

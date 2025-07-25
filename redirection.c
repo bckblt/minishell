@@ -16,19 +16,15 @@ int ft_heredoc(char **redirections, t_list *mini)
         if (strcmp(redirections[i], "<<") == 0 && redirections[i + 1])
         {
             delimiter = redirections[i + 1];
-
-            // Önceki pipe'ı kapat
             if (fd[0] != -1)
                 close(fd[0]);
             if (fd[1] != -1)
                 close(fd[1]);
-
             if (pipe(fd) == -1)
             {
                 ft_putstr_fd("minishell: pipe error\n", STDERR_FILENO);
                 return (-1);
             }
-
             while (1)
             {
                 line = readline("> ");
@@ -43,8 +39,6 @@ int ft_heredoc(char **redirections, t_list *mini)
                     free(line);
                     break;
                 }
-                
-                // Mevcut exp_dollar fonksiyonunu kullan
                 expanded_line = exp_dollar(line, 0, mini);
                 
                 write(fd[1], expanded_line, strlen(expanded_line));
@@ -57,74 +51,11 @@ int ft_heredoc(char **redirections, t_list *mini)
         }
         i++;
     }
-    // Sadece son pipe'ın write ucunu kapat, read ucunu return et
     if (fd[1] != -1)
         close(fd[1]);
     return fd[0];
 }
 
-// Yardımcı fonksiyon: heredoc için basit dollar expansion
-char *expand_heredoc_line(char *line)
-{
-    if (!if_has_dollar(line))
-        return line;
-    
-    char *result = malloc(1024); // Yeterli buffer
-    int i = 0, j = 0;
-    
-    while (line[i])
-    {
-        if (line[i] == '$' && line[i + 1])
-        {
-            if (line[i + 1] == '$')
-            {
-                // Process ID
-                int pid = getpid();
-                char pid_str[20];
-                sprintf(pid_str, "%d", pid);
-                strcpy(result + j, pid_str);
-                j += strlen(pid_str);
-                i += 2;
-            }
-            else if (line[i + 1] == '?')
-            {
-                // Exit code - heredoc'da genelde 0
-                result[j++] = '0';
-                i += 2;
-            }
-            else if (ft_isalnum(line[i + 1]) || line[i + 1] == '_')
-            {
-                // Environment variable
-                char env_name[256];
-                int k = 0;
-                i++; // Skip $
-                
-                while (line[i] && (ft_isalnum(line[i]) || line[i] == '_'))
-                    env_name[k++] = line[i++];
-                env_name[k] = '\0';
-                
-                char *env_value = getenv(env_name);
-                if (env_value)
-                {
-                    strcpy(result + j, env_value);
-                    j += strlen(env_value);
-                }
-            }
-            else
-            {
-                result[j++] = line[i++];
-            }
-        }
-        else
-        {
-            result[j++] = line[i++];
-        }
-    }
-    result[j] = '\0';
-    return result;
-}
-
-// Diğer fonksiyonlar aynı kalır...
 void fd_closer(char *file, t_fd *fds, t_list *mini)
 {
     (void)file;
@@ -150,8 +81,7 @@ void apply_redirections(char **redirections, t_fd *fds, t_list *mini)
     int i = 0;
     char *type;
     char *file;
-    
-    // Initialize fds if not already done
+
     if (!fds) 
     {
         mini->exit_code = 1;
@@ -170,7 +100,6 @@ void apply_redirections(char **redirections, t_fd *fds, t_list *mini)
                 fd_closer_right(file, fds, mini);
                 return;
             }
-            // Save current stdout only if not already saved
             if (fds->stdout == 0)
                 fds->stdout = dup(STDOUT_FILENO);
             dup2(fd, STDOUT_FILENO);
@@ -184,7 +113,6 @@ void apply_redirections(char **redirections, t_fd *fds, t_list *mini)
                 fd_closer_right(file, fds, mini);
                 return;
             }
-            // Save current stdout only if not already saved
             if (fds->stdout == 0)
                 fds->stdout = dup(STDOUT_FILENO);
             dup2(fd, STDOUT_FILENO);
@@ -195,10 +123,10 @@ void apply_redirections(char **redirections, t_fd *fds, t_list *mini)
             int fd = open(file, O_RDONLY);
             if (fd == -1)
             {
+                //ft_putstr_fd("--------\n", 2);
                 fd_closer(file, fds, mini);
                 return;
             }
-            // Save current stdin only if not already saved
             if (fds->stdin == 0)
                 fds->stdin = dup(STDIN_FILENO);
             dup2(fd, STDIN_FILENO);

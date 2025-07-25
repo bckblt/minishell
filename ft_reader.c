@@ -39,7 +39,8 @@ void exec_builtin(t_cmd *cmd, t_list *mini, char **env)
 int heredoc_ctrl(t_cmd *cmd)
 {
     t_cmd *tmp = cmd;
-
+    int i;
+    i = 0;
     while (tmp)
     {
         if (!tmp->redirections)
@@ -47,11 +48,11 @@ int heredoc_ctrl(t_cmd *cmd)
             tmp = tmp->next;
             continue;
         }
-
-        for (int i = 0; tmp->redirections[i]; i += 2)
+        while (tmp->redirections[i])
         {
             if (ft_strcmp(tmp->redirections[i], "<<") == 0)
                 return (1);
+            i += 2;
         }
         tmp = tmp->next;
     }
@@ -60,13 +61,16 @@ int heredoc_ctrl(t_cmd *cmd)
 
 int has_input_redirection(t_cmd *cmd)
 {
+    int i;
+    i = 0;
     if (!cmd->redirections)
         return 0;
     
-    for (int i = 0; cmd->redirections[i]; i += 2)
+    while (cmd->redirections[i])
     {
         if (ft_strcmp(cmd->redirections[i], "<") == 0)
             return 1;
+        i += 2;
     }
     return 0;
 }
@@ -77,37 +81,35 @@ void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
     int pipe_fd[2];
     int heredoc_fd = -1;
     pid_t last_pid = -1;
-
+    int has_input_redir;
+    
     while (cmd)
     {
         if (cmd->next)
             pipe(pipe_fd);
-
         if (heredoc_ctrl(cmd))
             heredoc_fd = ft_heredoc(cmd->redirections, mini);
-
         pid_t pid = fork();
         if (pid == 0)
         {
-            // Input redirection kontrolu
-            int has_input_redir = has_input_redirection(cmd);
-            // Pipe input - sadece input redirection yoksa uygula
+            has_input_redir = has_input_redirection(cmd);
             if (prev_pipe_in != -1 && !has_input_redir && heredoc_fd == -1)
+            {
                 dup2(prev_pipe_in, STDIN_FILENO);
-            // Pipe output
+            }
             if (cmd->next)
                 dup2(pipe_fd[1], STDOUT_FILENO);
-            // Heredoc input
-            if (heredoc_fd != -1)
-                dup2(heredoc_fd, STDIN_FILENO);
-            // Normal redirections
-            if (cmd->redirections && heredoc_fd == -1)
+            if (cmd->redirections)
             {
                 apply_redirections(cmd->redirections, cmd->fd, mini);
                 if (mini->exit_code == 1)
                     exit(mini->exit_code);
             }
-            // Close unused pipe ends
+
+            if (heredoc_fd != -1)
+            {
+                dup2(heredoc_fd, STDIN_FILENO);
+            }
             if (prev_pipe_in != -1)
                 close(prev_pipe_in);
             if (cmd->next) {
@@ -116,7 +118,6 @@ void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
             }
             if (heredoc_fd != -1)
                 close(heredoc_fd);
-            
             if (is_builtin_command(cmd))
                 exec_builtin(cmd, mini, env);
             else
@@ -124,19 +125,22 @@ void ft_cmds(t_list *mini, t_cmd *cmd, char **env)
             exit(mini->exit_code);
         }
         last_pid = pid;
-        // Parent process: close unused pipe ends
         if (prev_pipe_in != -1)
             close(prev_pipe_in);
         if (heredoc_fd != -1)
+        {
             close(heredoc_fd);
+            heredoc_fd = -1;
+        }
+        
         if (cmd->next)
         {
             close(pipe_fd[1]);
             prev_pipe_in = pipe_fd[0];
-        } 
+        }
+        
         cmd = cmd->next;
     }
-    // Wait for all children
     int status;
     pid_t wpid;
     while ((wpid = wait(&status)) > 0)
